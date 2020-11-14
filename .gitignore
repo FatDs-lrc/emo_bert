@@ -1,0 +1,13 @@
+resources/
+.vscode/
+*/__pycache__
+preprocess/.tmp/
+preprocess/data/
+preprocess/DenseNet*
+preprocess/feature/
+preprocess/tools/active-speakers-context-master/
+preprocess/tools/asv_exp/
+preprocess/tools/denseface
+preprocess/tools/torchvggish
+preprocess/tools/wav2vec
+preprocess/tools/__pycache__
