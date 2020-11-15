@@ -13,6 +13,8 @@ import h5py
 import json
 import re, time
 import numpy as np
+import codecs
+import chardet
 from collections import OrderedDict
 from typing import List
 from numpy import ndarray
@@ -108,7 +110,7 @@ class TranscriptPackager(BaseWorker):
         # text = re.sub(u'[-_@#$%^*()_+={}\[\]\\\|<>/\n\r]+', "", text)
         # 改成
         # re.xxx(u'[a-zA-Z0-9,.!:\']+') 只保留大小写字母和数字, 以及一些标点
-        text = ''.join(re.findall(r'[A-Za-z0-9,.?!:;\'\"]', text))
+        text = ''.join(re.findall(r'[A-Za-z0-9,.?!:;\'\"\ ]', text))
         return text.strip()
     
     def get_transcripts_mode(self, lines):
@@ -141,12 +143,13 @@ class TranscriptPackager(BaseWorker):
         sentence_line_numbers = []
         for i, line in enumerate(lines):
             line = line.strip().replace('\ufeff', '')
-            if line.isnumeric():
+            if line.isdigit() and i != len(lines)-1 and '-->' in lines[i+1]:
                 sentence_line_numbers.append(i)
         sentence_line_numbers.append(None)
         mode = self.get_transcripts_mode(lines)
         for i in range(len(sentence_line_numbers)-1):
             contents = lines[sentence_line_numbers[i]: sentence_line_numbers[i+1]]
+            # print(contents)
             duration_info = contents[1]
             start = duration_info.split('-->')[0].strip().replace(',', '.')
             end = duration_info.split('-->')[1].strip().replace(',', '.')
@@ -154,6 +157,11 @@ class TranscriptPackager(BaseWorker):
             sentence = self.process_text(sentence, mode)
             ans.append({'start': start, 'end': end, "content": sentence, "index":i})
         return ans
+    
+    def calc_time(self, time_str):
+        assert len(time_str.split(':')) == 3, 'Time format should be %H:%M:%S, but got {}'.format(time_str)
+        hour, minite, second = time_str.split(':')
+        return float(hour) * 3600 + float(minite) * 60 + float(second)
 
     def __call__(self, transcript_file_path):
         basename = get_basename(transcript_file_path)
@@ -162,11 +170,12 @@ class TranscriptPackager(BaseWorker):
             self.print(f"Error: {transcript_file_path} not exists")
             return
         
-        try:
-            lines = open(transcript_file_path, encoding='utf8').readlines()
-        except UnicodeDecodeError:
-            self.print("Error in {}, Unicode Error.".format(transcript_file_path))
-            return 
+        # try:
+        #     lines = open(transcript_file_path, encoding='utf8').readlines()
+        # except UnicodeDecodeError:
+        #     self.print("Error in {}, Unicode Error.".format(transcript_file_path))
+        #     return 
+        lines = read_lines(transcript_file_path)
 
         if len(lines) == 0:
             self.print("Error in {}, empty file.".format(transcript_file_path))
@@ -180,6 +189,7 @@ class TranscriptPackager(BaseWorker):
         else:
             raise ValueError(f'[TranscriptPackager]: file format not supported: {transcript_file_path}')
         
+        ans = sorted(ans, key=lambda x: self.calc_time(x['start']))
         save_content = OrderedDict(
             [(x['index'], {"start":x['start'], "end":x['end'], "content":x['content']}) for x in ans]
         )
@@ -205,7 +215,6 @@ class BertExtractor(object):
         if self.model_name.split('_')[0] == 'bert':
             self.model = BertModel.from_pretrained(self.pretrained_path).to(self.device)
         else:
-            print('Albert')
             self.model = AlbertModel.from_pretrained('albert-base-v2').to(self.device)
 
         self.model.eval()
@@ -264,9 +273,24 @@ class BertExtractor(object):
     
     def __call__(self, sentence: str):
         return self.extract_sentence(sentence)
+    
+
+def read_lines(path):
+    f = open(path, 'rb')
+    data = f.read()
+    if len(data) == 0:
+        return []
+    
+    code_type = chardet.detect(data)['encoding']
+    if code_type.lower() == 'gb2312':
+        code_type = 'gbk'
+    # print(code_type)
+    content = data.decode(code_type)
+    content = re.split('[\n]', data.decode(code_type))
+    return content
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     # text_pipeline('../resources/raw_movies')
     # get_transcript = TranscriptExtractor('./transcripts/ass')
     # package_transcript = TranscriptPackager()
@@ -291,3 +315,8 @@ class BertExtractor(object):
     # # print(text)
     # process_transcripts = TranscriptPackager('data/transcripts/json')
     # a = process_transcripts('/data6/zjm/emobert/resources/raw_movies/No0022.Rent.srt')
+
+    a = read_lines('./data/transcripts/raw/No0047.Carol.srt')
+    # for x in a:
+    #     print(type(x))
+    print(a)

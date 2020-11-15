@@ -71,14 +71,15 @@ class VideoCutterOneClip(BaseWorker):
         basename = get_basename(video_path)
         save_dir = os.path.join(self.save_root, basename)
         mkdir(save_dir)
-        _cmd = 'ffmpeg -ss {} -t {} -i {} {} -y > /dev/null 2>&1' # -vcodec copy -acodec copy
+        # _cmd = 'ffmpeg -ss {} -t {} -i {} -c copy {} -y > /dev/null 2>&1' # -vcodec copy -acodec copy
+        _cmd = "ffmpeg -ss {} -to {} -accurate_seek -i {} -codec copy -avoid_negative_ts 1 -y {} > /dev/null 2>&1"
         save_path = os.path.join(save_dir, f"{transcript_info['index']}.mkv")
         if not os.path.exists(save_path):
             start = transcript_info["start"]
             end = transcript_info["end"]
-            duration = self.calc_time(end) - self.calc_time(start)
-            duration = self.strptime(duration)
-            os.system(_cmd.format(start, duration, video_path, save_path))
+            # duration = self.calc_time(end) - self.calc_time(start)
+            # duration = self.strptime(duration)
+            os.system(_cmd.format(start, end, video_path, save_path))
             # self.print(f"[{name}] From {video_path}, cut video of {start}->{end}")
         return save_dir
 

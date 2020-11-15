@@ -77,7 +77,7 @@ def filter_face_longest_spk(uttid):
 
 if __name__ == '__main__':
     import sys
-    num_worker = 20
+    num_worker = 24
     chunk_size = 1
     print()
     print('----------------Preprocessing Start---------------- ')
@@ -121,6 +121,9 @@ if __name__ == '__main__':
         for i, movie in enumerate(all_movies):
             print('[Main]: Processing', movie)
             movie_name = get_basename(movie)
+            # if movie_name != 'No0081.The.Wolf.of.Wall.Street':
+            #     continue
+        
             meta_dir = os.path.join(meta_root, movie_name)
             mkdir(meta_dir)
             movie_feature_dir = os.path.join(feature_dir, movie_name)
@@ -139,7 +142,7 @@ if __name__ == '__main__':
                 all_count['No_transcripts'].append(movie)
                 continue
         
-            transcript_info = transcript_info
+            # transcript_info = transcript_info[:100]
             sentences = list(map(lambda  x: x['content'], transcript_info))
             # 检查是否句子长度>1
             _have_sentence = []
@@ -170,7 +173,6 @@ if __name__ == '__main__':
                 ))[0]
             
             all_video_clip = sorted(glob.glob(os.path.join(video_clip_dir, '*.mkv')), key=lambda x: int(x.split('/')[-1].split('.')[0]))
-            assert len(all_video_clip) == len(transcript_info), len(all_video_clip)
             print('[Main]: Total clips found:', len(all_video_clip))
 
             # 切语音:
@@ -212,11 +214,11 @@ if __name__ == '__main__':
             pool.join()
 
             uttid_actspk = list(zip(utt_ids, active_spks))
-            _utt_ids = list(map(lambda x: x[0], filter(lambda x: x[1], uttid_actspk)))
+            _utt_ids = list(map(lambda x: x[0], filter(lambda x: x[1] is not None, uttid_actspk)))
             count['no_active_spk'] += [int(x.split('/')[-1]) for x in utt_ids if x not in _utt_ids] 
             utt_ids = _utt_ids
             save_uttid(utt_ids, os.path.join(meta_dir, 'has_active_spk.txt'))
-            print('[Main]: Total clips found with active speaker > 0.2*frames', len(utt_ids))
+            print('[Main]: Total clips found with active speaker:', len(utt_ids))
 
             # 统计数据
             mkdir("./data/check_data")
@@ -225,6 +227,7 @@ if __name__ == '__main__':
             json_path = os.path.join('./data/check_data', movie_name + '.json')
             json.dump(dict(count), open(json_path, 'w'), indent=4)
             gc.collect()
+            print('----------------------------------------------------------------------------\n')
 
     # dump all negative count
     json_path = "data/check_data/negative_count.json"
