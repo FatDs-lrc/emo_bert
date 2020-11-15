@@ -1,0 +1,23 @@
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in SMILExtract : openSMILE starting!
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in SMILExtract : config file is: /root/opensmile-2.3.0/config/ComParE_2016.conf
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in cComponentManager : successfully registered 96 component types.
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in instance 'lldhtksink' : No filename given, disabling this sink component.
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in instance 'lldarffsink' : No filename given, disabling this sink component.
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in instance 'arffsink' : No filename given, disabling this sink component.
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in instance 'csvsink' : No filename given, disabling this sink component.
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in instance 'htksink' : No filename given, disabling this sink component.
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in cComponentManager : successfully finished createInstances
+                                 (48 component instances were finalised, 1 data memories were finalised)
+[ 15.11.2020 - 15:07:00 ]
+    (MSG) [2] in cComponentManager : starting single thread processing loop
+[ 15.11.2020 - 15:07:01 ]
+    (MSG) [2] in cComponentManager : Processing finished! System ran for 371 ticks.
