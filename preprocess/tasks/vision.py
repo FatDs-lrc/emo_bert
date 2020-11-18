@@ -69,8 +69,7 @@ class DensefaceExtractor(BaseWorker):
             model: model class returned by function 'load_model'
         """
         super().__init__(logger=logger)
-        # restore_path = '/data2/zjm/AVEC2019/CES/feature/visual/model.denseface.k12.tune_csz/finetuned.model/finetune.train/DenseNet-BC_growth_rate=12_depth=100_dataset_AVEC/model/epoch-6'
-        restore_path = '/data7/lrc/MuSe2020/MuSe2020_features/code/wild/finetune_model/denseface_lrc_tune_av/DenseNet-BC_growth_rate=12_depth=100_dataset_MUSE/model/epoch-23'
+        restore_path = '/data2/zjm/tools/FER_models/denseface/DenseNet-BC_growth-rate12_depth100_FERPlus/model/epoch-200'
         self.model = self.load_model(restore_path)
         self.mean = mean
         self.std = std
@@ -91,8 +90,8 @@ class DensefaceExtractor(BaseWorker):
         keep_prob = 1.0
         bc_mode = True
         model_path = restore_path
-        dataset = 'MUSE'
-        num_class = 2
+        dataset = 'FER+'
+        num_class = 8
 
         DataProvider = collections.namedtuple('DataProvider', ['data_shape', 'n_classes'])
         data_provider = DataProvider(data_shape=(img_size, img_size, 1), n_classes=num_class)

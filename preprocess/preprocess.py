@@ -185,7 +185,7 @@ if __name__ == '__main__':
             frame_dirs = list(tqdm(pool.imap(get_frames, all_video_clip, chunksize=chunk_size), total=len(all_video_clip)))
             print('[Main]: Start extracting faces')
             face_dirs = list(tqdm(pool.imap(get_faces, frame_dirs, chunksize=chunk_size), total=len(frame_dirs)))
-            assert len(utt_ids) == len(face_dirs)
+            # assert len(utt_ids) == len(face_dirs)
             # 先去除完全没有人脸的片段, 保存成一个json
             print('[Main]: Filtering out clip with no faces')
             _utt_ids = pool_filter(has_face, utt_ids, pool)

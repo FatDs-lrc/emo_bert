@@ -52,11 +52,11 @@ class ComParEExtractor(BaseWorker):
     
     def __call__(self, wav):
         save_path = os.path.join(self.tmp_dir, get_basename(wav)+".csv")
-        if not os.path.exists(save_path):
-            cmd = 'SMILExtract -C ~/opensmile-2.3.0/config/ComParE_2016.conf \
-                -appendcsvlld 0 -timestampcsvlld 1 -headercsvlld 1 \
-                -I {} -lldcsvoutput {} -instname xx -O ? -noconsoleoutput 1'
-            os.system(cmd.format(wav, save_path))
+        # if not os.path.exists(save_path):
+        cmd = 'SMILExtract -C ~/opensmile-2.3.0/config/ComParE_2016.conf \
+            -appendcsvlld 0 -timestampcsvlld 1 -headercsvlld 1 \
+            -I {} -lldcsvoutput {} -instname xx -O ? -noconsoleoutput 1'
+        os.system(cmd.format(wav, save_path))
         
         df = pd.read_csv(save_path, delimiter=';')
         # timestamp = np.array(df['frameTime'])
